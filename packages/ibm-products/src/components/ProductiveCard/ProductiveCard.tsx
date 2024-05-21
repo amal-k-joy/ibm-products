@@ -279,6 +279,7 @@ ProductiveCard.propTypes = {
     PropTypes.object,
     PropTypes.node,
   ]),
+
   /**
    * Determines title size
    */
