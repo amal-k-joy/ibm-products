@@ -24,6 +24,8 @@ jobs:
       pull-requests: write
 
     steps:
+      - name: debug
+        run: "echo Comment body: ${{ github.event.comment.body }}"
       - name: Checkout PR code
         uses: actions/checkout@v3
         with:
