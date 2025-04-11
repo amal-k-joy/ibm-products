@@ -9,6 +9,7 @@ on:
 jobs:
   vrt-runner:
     if: |
+
       github.event_name == 'issue_comment' &&
       github.event.issue.pull_request &&
       github.event.comment.body == '/run-vrt'
