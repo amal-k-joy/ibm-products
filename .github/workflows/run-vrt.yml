@@ -11,10 +11,6 @@ on:
 
 jobs:
   vrt-runner:
-    if: |
-      github.event_name == 'issue_comment' &&
-      github.event.issue.pull_request &&
-      github.event.comment.body == '/run-vrt'
     runs-on: ubuntu-latest
     env:
       PERCY_TOKEN: 'web_d04495b0b413d61c2ea6b9118d1748b43f4fdd58d17ebe453ef8e0016b5766e4'
