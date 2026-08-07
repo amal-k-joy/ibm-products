@@ -14,6 +14,7 @@
 @use '../../global/styles/project-settings' as *;
 @use '../../global/styles/mixins' as *;
 @use '@carbon/layout/scss/convert';
+@use '@carbon/styles/scss/utilities/focus-outline';
 
 $block-class__next: #{$pkg-prefix}--tearsheet__next;
 $motion-duration: $duration-moderate-02;
@@ -107,7 +108,12 @@ $transform-start: translate3d(0, calc(min(95vh, 500px)), 0);
     border: 1px solid $border-subtle-01;
     block-size: 100%;
     inset-block-start: auto;
-    max-block-size: calc(100% - var(--tearsheet-vertical-gap, #{$spacing-09}));
+    max-block-size: calc(
+      100% - var(
+          --tearsheet-vertical-gap,
+          calc(#{$spacing-11} + #{$spacing-03})
+        )
+    );
     max-inline-size: var(--tearsheet-max-inline-size, 1312px);
   }
   &:not(.#{$block-class__next}--stack-activated.is-visible) {
@@ -255,7 +261,6 @@ $transform-start: translate3d(0, calc(min(95vh, 500px)), 0);
         opacity $motion-duration motion(entrance, expressive),
         margin $motion-duration motion(entrance, expressive),
         padding $motion-duration motion(entrance, expressive);
-      visibility: hidden;
     }
 
     .#{$block-class__next}__header-actions,
@@ -272,9 +277,13 @@ $transform-start: translate3d(0, calc(min(95vh, 500px)), 0);
     }
   }
 
+  .#{$carbon-prefix}--modal-close {
+    transition: all $motion-duration ease;
+  }
+
   // COLLAPSED STATE
   .#{$block-class__next}__header-collapsed {
-    padding-block-start: $spacing-04;
+    padding-block-start: 0;
     transition: padding $motion-duration motion(entrance, expressive);
 
     // Collapse everything except core elements
@@ -318,6 +327,7 @@ $transform-start: translate3d(0, calc(min(95vh, 500px)), 0);
       @include type.type-style('label-02');
 
       align-items: center;
+      gap: $spacing-03;
       margin-block-start: $spacing-02;
       transition: all $motion-duration motion(entrance, expressive);
 
@@ -339,8 +349,22 @@ $transform-start: translate3d(0, calc(min(95vh, 500px)), 0);
       margin-block-end: 0;
     }
 
+    .#{$carbon-prefix}--modal-close {
+      block-size: $spacing-08;
+      inline-size: $spacing-08;
+      transition: all $motion-duration ease;
+    }
+    .#{$block-class__next}__decorator {
+      inset-block-start: $spacing-03;
+    }
+    .#{$block-class__next}__header-title {
+      block-size: $spacing-08;
+    }
+
     .#{$block-class__next}__content__header-actions {
-      margin-block-start: -$spacing-01;
+      block-size: $spacing-06;
+      margin-block-start: $spacing-03;
+      transition: all $motion-duration ease;
     }
 
     // Hide header actions on small screens
@@ -362,7 +386,7 @@ $transform-start: translate3d(0, calc(min(95vh, 500px)), 0);
 
     .#{$block-class__next}__header-content-wrapper {
       min-block-size: $spacing-08;
-      padding-block-end: $spacing-04;
+      // padding-block-end: $spacing-04;
     }
 
     // Divider line above navigation bar
@@ -407,7 +431,10 @@ $transform-start: translate3d(0, calc(min(95vh, 500px)), 0);
     &.is-visible {
       .#{$block-class__next}__container {
         max-block-size: calc(
-          100% - var(--tearsheet-vertical-gap, #{$spacing-09}) +
+          100% - var(
+              --tearsheet-vertical-gap,
+              calc(#{$spacing-11} + #{$spacing-03} + #{$spacing-01})
+            ) +
             var(--block-size-change)
         );
         transform: scaleX(var(--scale-factor));
@@ -458,7 +485,7 @@ $transform-start: translate3d(0, calc(min(95vh, 500px)), 0);
 .#{$block-class__next}__decorator {
   position: absolute;
   inset-block-start: convert.to-rem(10px);
-  inset-inline-end: convert.to-rem(48px);
+  inset-inline-end: $spacing-09;
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -585,6 +612,10 @@ $transform-start: translate3d(0, calc(min(95vh, 500px)), 0);
   > *:only-child {
     grid-column: 1 / -1;
   }
+
+  .#{$carbon-prefix}--tab-content {
+    padding: 0;
+  }
 }
 
 .#{$block-class__next}__footer {
@@ -632,6 +663,10 @@ $transform-start: translate3d(0, calc(min(95vh, 500px)), 0);
       padding-inline: $spacing-05;
     }
   }
+
+  &:focus {
+    @include focus-outline.focus-outline('outline');
+  }
 }
 
 .#{$block-class__next}__main-content {
@@ -650,12 +685,26 @@ $transform-start: translate3d(0, calc(min(95vh, 500px)), 0);
 }
 
 .#{$block-class__next}--narrow {
+  // Fixed 480px width; shrinks only when viewport is narrower than 480px
+  .#{$block-class__next}__container {
+    inline-size: 480px;
+    max-inline-size: 480px;
+
+    @media (width <= 480px) {
+      inline-size: 100%;
+      max-inline-size: 100%;
+    }
+  }
+
   .#{$block-class__next}__header {
     padding-inline: $spacing-05;
   }
   .#{$block-class__next}__header.#{$block-class__next}__header-collapsed {
     .#{$block-class__next}__header-actions {
       display: none;
+    }
+    .#{$block-class__next}__header-content {
+      align-self: flex-start;
     }
   }
   .#{$block-class__next}__header-content-wrapper {

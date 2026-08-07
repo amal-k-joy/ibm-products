@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corp. 2024, 2025
+ * Copyright IBM Corp. 2024, 2026
  *
  * This source code is licensed under the Apache-2.0 license found in the
  * LICENSE file in the root directory of this source tree.
@@ -25,8 +25,14 @@ import { CoachmarkContext, blockClass } from './context';
 import CoachmarkContent, { CoachmarkContentProps } from './CoachmarkContent';
 import { Popover, NewPopoverAlignment } from '@carbon/react';
 import { useIsomorphicEffect } from '../../../../global/js/hooks';
-import { ContentHeader, ContentHeaderProps } from './ContentHeader';
-import { ContentBody, ContentBodyProps } from './ContentBody';
+import {
+  CoachmarkContentHeader,
+  CoachmarkContentHeaderProps,
+} from './CoachmarkContentHeader';
+import {
+  CoachmarkContentBody,
+  CoachmarkContentBodyProps,
+} from './CoachmarkContentBody';
 
 // The block part of our conventional BEM class names (blockClass__E--M).
 
@@ -66,7 +72,7 @@ export interface CoachmarkPropsNext {
    */
   align?: NewPopoverAlignment;
   /**
-   * Fine tune the position of the target in pixels.
+   * Fine tune the position of the target in pixels. Applies only to Beacons.
    */
   position?: { x: number; y: number };
   /**
@@ -87,24 +93,28 @@ export interface CoachmarkPropsNext {
   caret?: boolean;
   /**
    * CSS selector for the element that should receive focus when the coachmark opens.
-   * If not provided, no automatic focus management will occur.
    */
   selectorPrimaryFocus?: string;
   /**
-   * Optional ref for an external trigger element, used when the trigger is not part of the coachmark.
+   * Prevents the Coachmark from closing when clicking outside of it.
    */
-  triggerRef?: RefObject<HTMLElement>;
+  preventCloseOnClickOutside?: boolean;
+  /**
+   * A ref to the trigger element that launched the Coachmark. When provided,
+   * focus returns to this element when the Coachmark closes, and `aria-expanded`
+   * is automatically managed on that element — do not set `aria-expanded`
+   * directly on the trigger when using this prop.
+   */
+  launcherButtonRef?: RefObject<HTMLElement | null>;
 }
 
-type CoachmarkContentComponent = FC<CoachmarkContentProps> & {
-  Header: FC<ContentHeaderProps>;
-  Body: FC<ContentBodyProps>;
-};
-// Define the type for Coachmark, extending it to include Trigger and Content
+// Define the type for Coachmark, extending it to include Content, ContentHeader, and ContentBody
 export type CoachmarkComponent = ForwardRefExoticComponent<
   CoachmarkPropsNext & RefAttributes<HTMLDivElement>
 > & {
-  Content: CoachmarkContentComponent;
+  Content: FC<CoachmarkContentProps>;
+  ContentHeader: FC<CoachmarkContentHeaderProps>;
+  ContentBody: FC<CoachmarkContentBodyProps>;
 };
 
 /**
@@ -126,14 +136,18 @@ export const Coachmark = forwardRef<HTMLDivElement, CoachmarkPropsNext>(
       highContrast,
       caret,
       selectorPrimaryFocus,
-      triggerRef: triggerRefProp,
+      preventCloseOnClickOutside,
+      launcherButtonRef,
       ...rest
     } = props;
-    const internalTriggerRef = useRef<HTMLElement>(null);
-    const triggerRef = triggerRefProp ?? internalTriggerRef;
     const internalRef = useRef<HTMLDivElement | null>(null);
     const [contentRef, setContentRef] = useState<HTMLElement | null>(null);
     const [openState, setOpenState] = useState(false);
+
+    const shouldPreventClose =
+      preventCloseOnClickOutside !== undefined
+        ? preventCloseOnClickOutside
+        : floating === true;
 
     const setOpen = (value: boolean) => {
       if (!value) {
@@ -149,34 +163,11 @@ export const Coachmark = forwardRef<HTMLDivElement, CoachmarkPropsNext>(
       caret !== undefined ? caret : floating === true ? false : true;
 
     useEffect(() => {
-      if (triggerRefProp?.current) {
-        return;
-      }
-
-      const container = internalRef.current;
-      if (!container) {
-        return;
-      }
-
-      const focusableElements = Array.from(
-        container.querySelectorAll('*')
-      ) as HTMLElement[];
-
-      const firstFocusable = focusableElements.find(
-        (el) => el.tabIndex >= 0 && !el.hasAttribute('disabled')
-      );
-
-      if (firstFocusable) {
-        triggerRef.current = firstFocusable;
-      }
-    }, [children, triggerRef, triggerRefProp]);
-
-    useEffect(() => {
-      const el = triggerRef.current;
+      const el = launcherButtonRef?.current;
       if (el) {
-        el.setAttribute('aria-expanded', String(!!open));
+        el.setAttribute('aria-expanded', String(currentOpen));
       }
-    }, [open, triggerRef]);
+    }, [currentOpen, launcherButtonRef]);
 
     // Reset position when coachmark closes
     useEffect(() => {
@@ -206,12 +197,10 @@ export const Coachmark = forwardRef<HTMLDivElement, CoachmarkPropsNext>(
       }
     };
 
-    const handleRequestClose = (event?: Event) => {
-      // Don't close on outside clicks when floating is enabled
-      if (floating) {
+    const handleRequestClose = () => {
+      if (shouldPreventClose) {
         return;
       }
-
       onClose?.();
       setOpen(false);
     };
@@ -223,7 +212,7 @@ export const Coachmark = forwardRef<HTMLDivElement, CoachmarkPropsNext>(
           open: currentOpen,
           setOpen,
           align,
-          triggerRef,
+          launcherButtonRef,
           position,
           contentRef,
           setContentRef,
@@ -232,7 +221,6 @@ export const Coachmark = forwardRef<HTMLDivElement, CoachmarkPropsNext>(
         }}
       >
         <div
-          {...rest}
           ref={setRef}
           className={cx(blockClass, className, {
             [`${blockClass}--floating`]: floating,
@@ -240,6 +228,7 @@ export const Coachmark = forwardRef<HTMLDivElement, CoachmarkPropsNext>(
           {...getDevtoolsProps(componentName)}
         >
           <Popover
+            {...rest}
             open={currentOpen}
             onRequestClose={handleRequestClose}
             align={align as NewPopoverAlignment}
@@ -247,17 +236,6 @@ export const Coachmark = forwardRef<HTMLDivElement, CoachmarkPropsNext>(
             highContrast={highContrast ?? true}
             dropShadow={dropShadow}
           >
-            {triggerRefProp?.current ? (
-              <span
-                aria-hidden="true"
-                style={{ display: 'contents' }}
-                ref={(node) => {
-                  if (node && triggerRefProp.current) {
-                    node.replaceWith(triggerRefProp.current);
-                  }
-                }}
-              />
-            ) : null}
             {children}
           </Popover>
         </div>
@@ -266,8 +244,8 @@ export const Coachmark = forwardRef<HTMLDivElement, CoachmarkPropsNext>(
   }
 ) as CoachmarkComponent;
 Coachmark.Content = CoachmarkContent;
-Coachmark.Content.Header = ContentHeader;
-Coachmark.Content.Body = ContentBody;
+Coachmark.ContentHeader = CoachmarkContentHeader;
+Coachmark.ContentBody = CoachmarkContentBody;
 // The display name of the component, used by React. Note that displayName
 // is used in preference to relying on function.name.
 Coachmark.displayName = componentName;
@@ -315,19 +293,17 @@ Coachmark.propTypes = {
   /**
    * Fine tune the position of the target in pixels. Applies only to Beacons.
    */
-  // @ts-ignore
+  // @ts-ignore - PropTypes shape doesn't match TypeScript interface for position object
   position: PropTypes.shape({
     x: PropTypes.number,
     y: PropTypes.number,
   }),
   /**
+   * Prevents the Coachmark from closing when clicking outside of it.
+   */
+  preventCloseOnClickOutside: PropTypes.bool,
+  /**
    * CSS selector for the element that should receive focus when the coachmark opens.
    */
   selectorPrimaryFocus: PropTypes.string,
-  /**
-   * Optional ref for an external trigger element, used when the trigger is not part of the coachmark.
-   */
-  triggerRef: PropTypes.shape({
-    current: PropTypes.any,
-  }),
 };

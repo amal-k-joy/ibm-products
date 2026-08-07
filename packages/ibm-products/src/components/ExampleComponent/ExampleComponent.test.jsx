@@ -87,8 +87,8 @@ describe(componentName, () => {
       Promise.all(buttons.map((button) => userEvent.click(button)))
     );
 
-    expect(primaryHandler).toBeCalledTimes(1);
-    expect(secondaryHandler).toBeCalledTimes(1);
+    expect(primaryHandler).toHaveBeenCalledTimes(1);
+    expect(secondaryHandler).toHaveBeenCalledTimes(1);
   });
 
   it('renders the primaryButtonLabel and secondaryButtonLabel properties', async () => {
@@ -100,7 +100,7 @@ describe(componentName, () => {
   it('renders the primaryKind and secondaryKind properties', async () => {
     renderComponent({ primaryKind: 'danger', secondaryKind: 'tertiary' });
     expect(
-      screen.getByRole('button', { name: `danger ${primaryButtonLabel}` })
+      screen.getByRole('button', { name: primaryButtonLabel })
     ).toHaveClass(`${carbon.prefix}--btn--danger`);
     expect(
       screen.getByRole('button', { name: secondaryButtonLabel })

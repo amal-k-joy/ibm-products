@@ -1,4 +1,86 @@
-## `@carbon/ibm-products-web-components@0.39.0-rc.0`
+## `@carbon/ibm-products-web-components@0.45.0-rc.0`
+### Bug fixes :bug:
+- fix(useravatar): remove deprecated align options from wc stories (#9734)
+- fix(Tearsheet): design review changes and fixes in webcomponent (#9731)
+- fix(preview__Tearsheet): add aria-label for aside elements and fix double render (#9715)
+
+## `@carbon/ibm-products-web-components@0.44.0`
+### Features :rocket:
+- feat(tearsheet): preview tearsheet code connect integration (#9631)
+
+### Bug fixes :bug:
+- fix(BigNumber): Use figure & figcaption in both react and wc (#9707)
+- fix: open in stackblitz style issue fixed (#9699)
+- fix(coachmarkpatterns): animation (#9622)
+- fix: coachmark design review and a11y in web comp (#9598)
+
+### Housekeeping :house:
+- build(deps): update to Carbon 11 compatible versions to latest (#9660)
+
+## `@carbon/ibm-products-web-components@0.43.0`
+### Features :rocket:
+- feat(create-tearsheet): implemented as patterns in web components (#9552)
+
+### Bug fixes :bug:
+- fix(tearsheet): increase the top margin to 88px from 46px (#9471)
+- fix(preview_PageHeader): resolve a11y issues (#9519)
+
+### Housekeeping :house:
+- chore(deps): update dependency c8 to v11 (#9590)
+- chore: update typescript to v6 (#9591)
+- build(deps): update to Carbon 11 compatible versions to latest (#9539)
+
+## `@carbon/ibm-products-web-components@0.42.0`
+### Features :rocket:
+- feat(preview_PageHeader): implement disable sticky tab bar (#9365)
+- feat: focus trap for tearsheet wc (#9482)
+
+### Bug fixes :bug:
+- fix(deps): update dependency @carbon-labs/wc-empty-state to ^0.22.0 (#9422)
+- fix(preview__Tearsheet): accessibilty review issues fixes (#9512)
+- fix(deps): update dependency @lit-labs/signals to ^0.3.0 (#9555)
+- fix(sidepanel): consume resizer from carbon labs (#9472)
+
+## `@carbon/ibm-products-web-components@0.41.1`
+### Bug fixes :bug:
+- fix(release): remove private utilities package from dependencies (#9532)
+## `@carbon/ibm-products-web-components@0.41.1-rc.0`
+### Bug fixes :bug:
+- fix(release): remove private utilities package from dependencies (#9532)
+## `@carbon/ibm-products-web-components@0.41.0`
+### Features :rocket:
+- feat(EditInPlace): Web component implementation (#9384)
+- feat(AddSelect): composable add select with patterns (#9368)
+- feat(createTearsheetNarrow): implemented as pattern (#9404)
+
+### Housekeeping :house:
+- docs(changelog): update for v2.91.0-rc.0 (#9462)
+
+## `@carbon/ibm-products-web-components@0.41.0-rc.0`
+### Features :rocket:
+- feat(EditInPlace): Web component implementation (#9384)
+- feat(AddSelect): composable add select with patterns (#9368)
+- feat(createTearsheetNarrow): implemented as pattern (#9404)
+
+### Housekeeping :house:
+- docs(changelog): update for v2.91.0-rc.0 (#9462)
+
+## `@carbon/ibm-products-web-components@0.40.0`
+### Features :rocket:
+- feat(createfullpage): implemented as patterns in wc (#9275)
+
+### Bug fixes :bug:
+- fix(preview_PageHeader): fix header padding (#9440)
+- fix(options-tile): WC parity work  (#9387)
+- fix: increase code coverage > 80 (#9376)
+- fix(apikeymodal): parity  (#9313)
+
+### Housekeeping :house:
+- chore(deps): update dependency @mordech/vite-lit-loader to ^0.40.0 (#9235)
+- build(deps): update Carbon 11 compatible versions to latest (#9405)
+- chore(storybook): upgrade Storybook to 10 (#9392)
+
+## `@carbon/ibm-products-web-components@0.39.0`
 ### Bug fixes :bug:
 - fix(TruncatedText): provide keyboard accessibility (#9245)
 - fix(preview_PageHeader): `HeroImage` not taking the full height (#9268)

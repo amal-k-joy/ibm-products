@@ -6,9 +6,16 @@
  */
 
 import { MenuButton, MenuButtonProps, MenuItem } from '@carbon/react';
-import React, { ReactElement, ReactNode, useRef, useState } from 'react';
+import React, {
+  forwardRef,
+  ReactElement,
+  ReactNode,
+  useContext,
+  useRef,
+  useState,
+} from 'react';
 import { useIsomorphicEffect } from '../../../global/js/hooks';
-import { blockClass } from './context';
+import { blockClass, TearsheetContext } from './context';
 import { createOverflowHandler } from '@carbon/utilities';
 import cx from 'classnames';
 /**
@@ -16,30 +23,40 @@ import cx from 'classnames';
  * TearsheetHeaderActions
  * ----------------
  */
-type EnhancedChild = React.ReactElement<{ id: string; menuItemLabel: string }>;
+
+type EnhancedChild = React.ReactElement<{
+  id: string;
+  overflowItemLabel: string;
+}>;
+
 export interface TearsheetHeaderActionsProps {
   /**
-   * Provide child elements to be rendered inside TearsheetHeaderActions.
+   * Action items. Each should be a `TearsheetHeaderActionItem`.
    */
   children: EnhancedChild[];
+
   /**
-   * Specify an optional className to be added to your TearsheetHeaderActions
+   * Optional class name.
    */
   className?: string;
+
   /**
-   * The PageHeaderContent's page actions collapsible Menu button label
+   * Props forwarded to the overflow `MenuButton` shown when items exceed the
+   * available width.
    */
-  menuButtonProps?: MenuButtonProps;
+  menuButtonProps?: Partial<MenuButtonProps>;
 }
-export const TearsheetHeaderActions = ({
-  className,
-  children,
-  menuButtonProps,
-}: TearsheetHeaderActionsProps) => {
+export const TearsheetHeaderActions = forwardRef<
+  HTMLDivElement,
+  TearsheetHeaderActionsProps
+>(({ className, children, menuButtonProps }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const offsetRef = useRef<HTMLDivElement>(null);
+  const menuButtonContainerRef = useRef<HTMLDivElement>(null);
   const [menuButtonVisibility, setMenuButtonVisibility] = useState(false);
   const [hiddenItems, setHiddenItems] = useState<ReactElement[]>([]);
+
+  const { fullyCollapsed } = useContext(TearsheetContext);
 
   const hasOtherChildType = useRef(false);
 
@@ -98,7 +115,12 @@ export const TearsheetHeaderActions = ({
               hiddenItems.length === 0,
           })}
         >
-          <MenuButton size="sm" {...menuButtonProps}>
+          <MenuButton
+            ref={menuButtonContainerRef}
+            size={fullyCollapsed ? 'xs' : 'sm'}
+            label="Actions"
+            {...menuButtonProps}
+          >
             {hiddenItems.map((item) => {
               if (!React.isValidElement(item)) {
                 return null;
@@ -130,7 +152,9 @@ export const TearsheetHeaderActions = ({
       )}
     </div>
   );
-};
+});
+
+TearsheetHeaderActions.displayName = 'TearsheetHeaderActions';
 
 /**
  * ----------------
@@ -164,3 +188,4 @@ export const TearsheetHeaderActionItem = ({
     </div>
   );
 };
+TearsheetHeaderActionItem.displayName = 'TearsheetHeaderActionItem';

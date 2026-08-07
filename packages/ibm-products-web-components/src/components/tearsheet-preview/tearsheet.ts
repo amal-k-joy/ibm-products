@@ -20,6 +20,10 @@ import { SignalWatcher } from '@lit-labs/signals';
 import HostListenerMixin from '@carbon/web-components/es/globals/mixins/host-listener';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { stackManager } from './stack-signal';
+import {
+  trapFocus,
+  clearFocusableContainers,
+} from '../../utilities/manageFocusTrap/manageFocusTrap';
 
 /**
  * Tearsheet component - A slide-out panel for displaying detailed content.
@@ -31,6 +35,8 @@ import { stackManager } from './stack-signal';
  * @slot footer - Footer content with actions
  * @fires c4p-preview-tearsheet-beingclosed - Fired when the tearsheet is about to close
  * @fires c4p-preview-tearsheet-closed - Fired after the tearsheet has closed
+ * @fires c4p-preview-tearsheet-collapse-change - Fired when the header collapse state changes.
+ *   `event.detail.collapsed` is `true` when collapsing, `false` when expanding.
  */
 @customElement(`${prefix}-preview-tearsheet`)
 class CDSTearsheet extends SignalWatcher(HostListenerMixin(LitElement)) {
@@ -89,6 +95,12 @@ class CDSTearsheet extends SignalWatcher(HostListenerMixin(LitElement)) {
   preventCloseOnClickOutside: boolean = false;
 
   /**
+   * Optional ref to the trigger button that opened the tearsheet. Focus will return here when tearsheet closes.
+   */
+  @property({ attribute: false })
+  launcherButtonRef?: HTMLElement;
+
+  /**
    * Unique ID for this tearsheet instance
    */
   private uniqueId: string = `tearsheet-${Math.random().toString(36).substr(2, 9)}`;
@@ -109,6 +121,14 @@ class CDSTearsheet extends SignalWatcher(HostListenerMixin(LitElement)) {
    */
   @query('cds-modal-body')
   private modalBodyElement?: HTMLElement;
+
+  private _trapFocusAPI: { cleanup: () => void } | null = null;
+  private _wasOpen = false;
+  /**
+   * Query the header content element to get its titleId
+   */
+  @query(`${prefix}-tearsheet-header-content`)
+  private headerContentElement?: any;
 
   private smMediaQuery = `(max-width: ${breakpoints.md.width})`;
   private isSmallDevice = new MatchMediaController(
@@ -173,18 +193,45 @@ class CDSTearsheet extends SignalWatcher(HostListenerMixin(LitElement)) {
       `${prefix}-tearsheet-header-close-button-clicked`,
       this.handleHeaderCloseButtonClick as EventListener
     );
+
+    // Listen for internal collapse-change from header; re-dispatch as public event
+    this.addEventListener(
+      `${prefix}-tearsheet-header-collapse-change`,
+      this.handleHeaderCollapseChange as EventListener
+    );
   }
 
   protected firstUpdated(_changedProperties: PropertyValues): void {
     this.updateCSSCustomProperties();
     this.isSm = this.isSmallDevice?.matches || this.variant === 'narrow';
-    // Initialize all signals on first update
+    // Initialize all signals on first update, including uniqueId so children can register
     updateTearsheetSignals({
       variant: this.variant,
       isSm: this.isSm,
       open: this.open,
       hasAILabel: this.hasAILabel,
+      uniqueId: this.uniqueId,
+      ...this._readHeaderProps(),
+      onClose: () => this.closeTearsheet(),
     });
+  }
+
+  /** Read close-button props from the slotted c4p-tearsheet-header element */
+  private _readHeaderProps(): {
+    closeIconDescription: string;
+    hideCloseButton: boolean;
+  } {
+    const header = this.querySelector(`${prefix}-tearsheet-header`) as any;
+    return {
+      closeIconDescription:
+        header?.closeIconDescription ??
+        header?.getAttribute('close-icon-description') ??
+        'Close',
+      hideCloseButton:
+        header?.hideCloseButton ??
+        header?.hasAttribute('hide-close-button') ??
+        false,
+    };
   }
 
   protected updated(_changedProperties: PropertyValues): void {
@@ -216,6 +263,8 @@ class CDSTearsheet extends SignalWatcher(HostListenerMixin(LitElement)) {
     if (!_changedProperties.has('open')) {
       return;
     }
+    const wasOpen = this._wasOpen;
+    const isOpen = this.open;
 
     updateTearsheetSignals({ open: this.open });
 
@@ -229,6 +278,60 @@ class CDSTearsheet extends SignalWatcher(HostListenerMixin(LitElement)) {
     // Only update stack properties if stacking is enabled
     if (this._stackingEnabled) {
       this.updateStackProperties();
+    }
+
+    // Initialize focus trap when tearsheet opens
+    if (!wasOpen && isOpen) {
+      // `focusableContainers` holds the containers where we can query DOM elements.
+      // Our strategy here is to let child/slotted components register their containers,
+      // which are then passed to `trapFocus`. This allows the utility to query elements
+      // directly without being blocked by shadow DOM boundaries.
+
+      // Update signal with current uniqueId FIRST so children can register
+      updateTearsheetSignals({ uniqueId: this.uniqueId });
+
+      // Use requestAnimationFrame to ensure child components have registered their containers
+      requestAnimationFrame(() => {
+        this._trapFocusAPI = trapFocus(this as HTMLElement, this.uniqueId, () =>
+          this._getFirstFocusable()
+        );
+      });
+    }
+
+    this._wasOpen = isOpen;
+    //  Return focus to launcher button when tearsheet closes
+    if (!this.open && this.launcherButtonRef) {
+      // Use a small delay to ensure the tearsheet has fully closed
+      setTimeout(() => {
+        if (this.launcherButtonRef instanceof HTMLElement) {
+          // Check if the button is inside a TearsheetHeaderActions component
+          const headerActionItem = this.launcherButtonRef.closest(
+            `.${blockClass}__header-action-item`
+          );
+
+          if (headerActionItem) {
+            // This is a button inside TearsheetHeaderActions
+            // Check if it's currently visible or if items are collapsed to menu
+            const headerActionsContainer = headerActionItem.closest(
+              `.${blockClass}__content__header-actions`
+            );
+            const menuButton = headerActionsContainer?.querySelector(
+              `.${blockClass}__header-actions-menuButton:not(.${blockClass}__header-actions-menuButton--hidden) button`
+            );
+
+            if (menuButton instanceof HTMLElement) {
+              // On small screens, action buttons collapse to menu - focus the menu button
+              menuButton.focus();
+            } else {
+              // On large screens, focus the action button directly
+              this.launcherButtonRef.focus();
+            }
+          } else {
+            // Regular button ref (not inside TearsheetHeaderActions): focus directly
+            this.launcherButtonRef.focus();
+          }
+        }
+      }, 100);
     }
   }
 
@@ -280,8 +383,25 @@ class CDSTearsheet extends SignalWatcher(HostListenerMixin(LitElement)) {
     }
   }
 
+  /**
+   * Delegates to `c4p-tearsheet-header-content.getFirstFocusable()`.
+   * All priority logic lives in the component that owns the relevant DOM.
+   */
+  private _getFirstFocusable(): HTMLElement | null {
+    const headerContentEl = this.querySelector(
+      `${prefix}-tearsheet-header-content`
+    ) as (HTMLElement & { getFirstFocusable(): HTMLElement | null }) | null;
+
+    return headerContentEl?.getFirstFocusable() ?? null;
+  }
+
   disconnectedCallback() {
     super.disconnectedCallback();
+
+    // Cleanup focus trap and clear all registered containers
+    this._trapFocusAPI?.cleanup();
+
+    clearFocusableContainers();
 
     // Remove event listeners
     this.removeEventListener(
@@ -477,6 +597,25 @@ class CDSTearsheet extends SignalWatcher(HostListenerMixin(LitElement)) {
   };
 
   /**
+   * Intercepts the internal collapse-change event from the header and
+   * re-dispatches it as the public `c4p-preview-tearsheet-collapse-change` event.
+   */
+  private handleHeaderCollapseChange = (event: Event) => {
+    event.stopPropagation();
+    const { collapsed } = (event as CustomEvent).detail;
+    this.dispatchEvent(
+      new CustomEvent(
+        (this.constructor as typeof CDSTearsheet).eventCollapseChange,
+        {
+          bubbles: true,
+          composed: true,
+          detail: { collapsed },
+        }
+      )
+    );
+  };
+
+  /**
    * Handle close event from the modal (ESC key, click outside, etc.)
    */
   private handleClose = (event: Event) => {
@@ -513,6 +652,11 @@ class CDSTearsheet extends SignalWatcher(HostListenerMixin(LitElement)) {
 
     const containerClasses = `${blockClass}__container ${this.containerClassName}`;
 
+    const computedAriaLabelledby =
+      !this.ariaLabel && this.headerContentElement?.titleId
+        ? this.headerContentElement.titleId
+        : undefined;
+
     return html`<cds-modal
       class=${classes}
       size=${this.variant === 'narrow' ? 'sm' : 'lg'}
@@ -520,6 +664,7 @@ class CDSTearsheet extends SignalWatcher(HostListenerMixin(LitElement)) {
       container-class="${containerClasses}"
       ?prevent-close-on-click-outside="${this.preventCloseOnClickOutside}"
       aria-label="${ifDefined(this.ariaLabel || undefined)}"
+      aria-labelledby="${ifDefined(computedAriaLabelledby)}"
       selector-primary-focus="${ifDefined(
         this.selectorPrimaryFocus || undefined
       )}"
@@ -529,7 +674,6 @@ class CDSTearsheet extends SignalWatcher(HostListenerMixin(LitElement)) {
       ?full-width="${true}"
       ai-label="${ifDefined(this.hasAILabel || undefined)}"
     >
-      <slot name="decorator"></slot>
       <slot name="header"></slot>
       <cds-modal-body class="${blockClass}__body-layout">
         <slot
@@ -543,6 +687,14 @@ class CDSTearsheet extends SignalWatcher(HostListenerMixin(LitElement)) {
   }
 
   static styles = styles;
+
+  /**
+   * Public event fired when the header collapse state changes.
+   * `event.detail.collapsed` is `true` when collapsing, `false` when expanding.
+   */
+  static get eventCollapseChange() {
+    return `${prefix}-preview-tearsheet-collapse-change`;
+  }
 }
 
 export default CDSTearsheet;

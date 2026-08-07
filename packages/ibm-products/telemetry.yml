@@ -8,10 +8,13 @@ collect:
     elements:
       allowedAttributeNames:
         # General
+        - accordionItemProps
+        - accordionProps
         - action
         - actionIcons
         - actions
         - actionsPlacement
+        - actionsSlot
         - activeCellCoordinates
         - activeHref
         - addConditionSubGroupHandler
@@ -145,6 +148,7 @@ collect:
         - hasError
         - hasFieldset
         - headerActions
+        - headerContent
         - headerGroups
         - HeaderRow
         - headers
@@ -154,6 +158,7 @@ collect:
         - hideConditionPreviewHandler
         - hideConditionSubGroupPreviewHandler
         - hideIcon
+        - hideSearch
         - hideSelectAll
         - href
         - icon
@@ -188,6 +193,7 @@ collect:
         - isOpen
         - isTableSortable
         - item
+        - itemCount
         - items
         - itemsLabel
         - key
@@ -259,6 +265,7 @@ collect:
         - onRowClick
         - onRowExpand
         - onScroll
+        - onSearch
         - onSecondaryButtonClick
         - onSelectAllRows
         - onSelectColumn
@@ -277,6 +284,7 @@ collect:
         - overflowAriaLabel
         - overflowAutoAlign
         - overflowClassName
+        - overflowMenuLabel
         - overflowTags
         - overflowTooltipAlign
         - overflowType
@@ -304,6 +312,7 @@ collect:
         - readOnly
         - readOnlyTable
         - renderIcon
+        - renderItem
         - renderMedia
         - renderRowHeader
         - renderRowHeaderDirection
@@ -318,6 +327,8 @@ collect:
         - scoreThresholds
         - scrollBarSize
         - scroller
+        - searchPlaceholder
+        - searchProps
         - searchResultsTitle
         - secondaryActionLabel
         - secondaryButtonDisabled
@@ -332,6 +343,7 @@ collect:
         - selectAllToggle
         - selected
         - selectedHeaderReorderActive
+        - selectedItems
         - selectedOption
         - selectionAreas
         - selectorPageContent
@@ -375,10 +387,13 @@ collect:
         - tableHeight
         - tableId
         - tagline
+        - tagProps
         - tags
         - theme
         - title
+        - titleEnd
         - titleSize
+        - titleStart
         - toolbarBatchActions
         - toolbarBatchActionsDisplayMin
         - tooltipAlign
@@ -427,14 +442,29 @@ collect:
         - setSearchText
         # ActionSet
         - disableStacking
+        # AddSelect
+        - onItemSelect
         # AddSelectBody
+        - breadcrumbItemProps
+        - breadcrumbProps
         - defaultModifiers
         - globalFilterOpts
+        - layout
+        - linkProps
         - normalizedItems
+        - onBreadcrumbClick
+        - subHeaderActions
         - useNormalizedItems
         # AddSelectColumn
+        - allIndeterminate
+        - allSelected
         - header
+        - onNavigate
+        - onSelectAll
+        - searchLabel
+        - selectAllCheckboxProps
         - setPath
+        - showSelectAll
         # AddSelectFilter
         - appliedFilters
         - filterOpts
@@ -443,6 +473,8 @@ collect:
         - handleSearch
         - hasFiltersApplied
         - searchTerm
+        # AddSelectItemPanel
+        - closeIconButtonProps
         # AddSelectList
         - filteredItems
         - focus
@@ -455,6 +487,32 @@ collect:
         - singleSelection
         # AddSelectMetaPanel
         - meta
+        # AddSelectRow
+        - checkboxProps
+        - hasChildren
+        - hasItemPanel
+        - indeterminate
+        - itemId
+        - itemPanelIconButtonProps
+        - itemPanelIconDescription
+        - itemPanelOpen
+        - onItemPanelClick
+        - radioButtonProps
+        - rowContent
+        - skeleton
+        # AddSelectSelectionSummary
+        - editIconButtonProps
+        - editIconDescription
+        - emptyState
+        - onEdit
+        - showCount
+        - showEditIcon
+        # AddSelectSelectionSummaryItem
+        - removeButtonLabel
+        - removeIconButtonProps
+        - renderAccordionBody
+        - renderAccordionTitle
+        - useAccordion
         # AddSelectSort
         - setSortAttribute
         - setSortDirection
@@ -522,12 +580,22 @@ collect:
         # Canary
         - componentName
         # Card
+        - clickable
+        - density
         - getStarted
+        - horizontal
         # CardFooter
         - hasButton
         # CardHeader
         - inClickableCard
         - noActionIcons
+        # CardMedia
+        - mediaWidth
+        # CardTitle
+        - descriptionTruncate
+        - labelTruncate
+        - maxWidth
+        - titleTruncate
         # Carousel
         - disableArrowScroll
         - disableResetOnResize
@@ -555,7 +623,11 @@ collect:
         - position
         - positionTune
         - target
-        - triggerRef
+        # CoachmarkContent
+        - aria-label
+        # CoachmarkContentHeader
+        - dragAriaLabel
+        - dragIconDescription
         # CoachmarkDragbar
         - a11yKeyboardHandler
         - onDrag
@@ -604,8 +676,6 @@ collect:
         # ConditionPreview
         - colorIndex
         - previewType
-        # ContentHeader
-        - dragIconDescription
         # CreateFullPage
         - breadcrumbsOverflowAriaLabel
         - maxVisibleBreadcrumbs
@@ -718,17 +788,11 @@ collect:
         - onPanelClose
         - onPanelOpen
         - searchLabelText
-        - searchPlaceholder
         - showFilterSearch
-        # FilterPanelAccordion
-        - accordionProps
         # FilterPanelAccordionItem
-        - accordionItemProps
         - truncatedListProps
         # FilterPanelCheckboxWithOverflow
         - overflowMenuProps
-        # FilterPanelSearch
-        - searchProps
         # FilterSummary
         - clearButtonInline
         - clearFilters
@@ -755,8 +819,6 @@ collect:
         - maxFileSize
         - maxFileSizeErrorBody
         - maxFileSizeErrorHeader
-        # Influencer
-        - influencerPanelOpen
         # InlineEditButton
         - columnConfig
         - isActiveCell
@@ -871,6 +933,7 @@ collect:
         - pageActionsOverflowLabel
         - withoutBackground
         # PageHeaderBreadcrumbBar
+        - actionsAriaLabel
         - contentActions
         - contentActionsFlush
         - pageActionsFlush
@@ -878,13 +941,17 @@ collect:
         - renderOverflowBreadcrumb
         # PageHeaderBreadcrumbPageActions
         - buttonKind
-        - overflowMenuLabel
         # PageHeaderContent
         - contextualActions
+        - titleAs
         # PageHeaderContentPageActions
         - menuButtonLabel
+        # PageHeaderContentText
+        - subtitleAs
         # PageHeaderHeroImage
         - objectFit
+        # PageHeaderTabBar
+        - disableStickyTabBar
         # PageHeaderTagOverflow
         - renderOverflowTag
         - renderPopoverContent
@@ -949,7 +1016,6 @@ collect:
         # Sortable
         - adjustScale
         - Container
-        - itemCount
         - restrictToParent
         - sortableProps
         - strategy
@@ -963,8 +1029,6 @@ collect:
         # StringFormatter
         - tooltipDirection
         - width
-        # SummaryContent
-        - summaryPanelOpen
         # TagOverflow
         - tagComponent
         # Tearsheet
@@ -975,19 +1039,22 @@ collect:
         - verticalGap
         # TearsheetHeader
         - disableHeaderCollapse
+        - onHeaderCollapse
         # TearsheetHeaderActionItem
         - overflowItemLabel
         # TearsheetHeaderActions
         - menuButtonProps
-        # TearsheetHeaderContent
-        - titleEnd
-        - titleStart
+        # TearsheetInfluencer
+        - influencerPanelAriaLabel
+        - influencerPanelOpen
+        - influencerPanelTriggerRef
         # TearsheetPresence
         - _autoEnablePresence
         - _presenceId
-        # TearsheetWithSteps
-        - progressIndicator
-        - setOpen
+        # TearsheetSummaryContent
+        - summaryPanelAriaLabel
+        - summaryPanelOpen
+        - summaryPanelTriggerRef
         # Toolbar
         - vertical
         # TruncatedList
@@ -1225,12 +1292,18 @@ collect:
         # General - verticalPosition
         - lower
         - normal
+        # AddSelectBody - layout
+        - horizontal
+        - vertical
         # APIKeyDownloader - fileType
         - json
         - txt
         # APIKeyModal - downloadFileType
         - json
         - txt
+        # Card - density
+        - expressive
+        - productive
         # Checklist - toggleLabelAlign
         - bottom
         - bottom-left
@@ -1290,6 +1363,19 @@ collect:
         - primary
         - secondary
         - tertiary
+        # PageHeaderContent - titleAs
+        - h1
+        - h2
+        - h3
+        - h4
+        - h5
+        - h6
+        # PageHeaderContentText - subtitleAs
+        - h2
+        - h3
+        - h4
+        - h5
+        - h6
         # PageHeaderHeroImage - objectFit
         - contain
         - cover
@@ -1299,9 +1385,6 @@ collect:
         - lg
         - md
         - sm
-        # TearsheetWithSteps - progressIndicator
-        - horizontal
-        - vertical
   npm:
     dependencies: null
   js:

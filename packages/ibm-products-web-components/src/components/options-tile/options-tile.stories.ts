@@ -12,6 +12,7 @@ import { fn } from 'storybook/test';
 import './index';
 import '@carbon/web-components/es/components/toggle/index.js';
 import '@carbon/web-components/es/components/dropdown/index.js';
+import { languages, locales, blockClass } from './option-tile-helpers.ts';
 import styles from './story-styles.scss?lit';
 
 const argTypes = {
@@ -22,6 +23,11 @@ const argTypes = {
   defaultOpen: {
     control: 'boolean',
     description: 'If `true` the body of the component is shown',
+  },
+  enabled: {
+    control: 'boolean',
+    description:
+      'Whether the toggle is enabled or disabled. If nothing is passed, no toggle will be rendered.',
   },
   size: {
     control: 'radio',
@@ -40,16 +46,37 @@ const argTypes = {
     control: 'text',
     description: 'Text for the title',
   },
+  locked: {
+    control: 'boolean',
+    description: 'Whether the OptionsTile is in locked validation state.',
+  },
+  lockedText: {
+    control: 'text',
+    description:
+      'Provide a text explaining why the OptionsTile is in locked state.',
+  },
+  warn: {
+    control: 'boolean',
+    description: 'Whether the OptionsTile is in warning validation state.',
+  },
+  warnText: {
+    control: 'text',
+    description:
+      'Provide a text explaining why the OptionsTile is in warning state.',
+  },
 };
-
-const blockClass = 'options-tile';
 
 export const Default = {
   args: {
     defaultOpen: false,
+    enabled: true,
     size: 'lg',
     titleId: 'title-01',
     titleText: 'Language',
+    locked: false,
+    lockedText: 'This option is managed by your administrator',
+    warn: false,
+    warnText: 'A restart is required to apply these settings',
   },
   argTypes,
   render: (args) => {
@@ -57,42 +84,109 @@ export const Default = {
       <style>
         ${styles}
       </style>
-      <c4p-options-tile
-        class=${blockClass}
-        ?defaultOpen=${args.defaultOpen}
-        id="my-tile"
-        size=${args.size}
-        titleId=${args.titleId}
-        titleText=${args.titleText}
-        @c4p-options-tile-open=${console.log('open option tile')}
-        @c4p-options-tile-close=${console.log('close option tile')}
-      >
-        <div slot="summary">
-          <span>English | Locale: English</span>
-        </div>
-        <div slot="toggle">
-          <cds-toggle id="my-toggle" size="sm" hideLabel></cds-toggle>
-        </div>
-        <div slot="body">
-          <div class=${`${blockClass}__body`}>
-            <p>
-              User interface defines the language the application is displayed
-              in. Locale sets the regional display formats for information like
-              time, date, currency and decimal delimiters.
-            </p>
-            <div class=${`${blockClass}__dropdown`}>
-              <cds-dropdown title-text="User interface" label="User interface">
-                <cds-dropdown-item value="option-0">English</cds-dropdown-item>
-              </cds-dropdown>
-            </div>
-            <div class=${`${blockClass}__dropdown`}>
-              <cds-dropdown title-text="Locale" label="Locale">
-                <cds-dropdown-item value="option-0">English</cds-dropdown-item>
-              </cds-dropdown>
+      <div class="${blockClass}-wrapper">
+        <c4p-options-tile
+          class=${blockClass}
+          ?defaultOpen=${args.defaultOpen}
+          id="my-tile"
+          size=${args.size}
+          titleId=${args.titleId}
+          titleText=${args.titleText}
+          ?locked=${args.locked}
+          lockedText=${args.lockedText}
+          ?warn=${args.warn}
+          warnText=${args.warnText}
+          @c4p-options-tile-open=${console.log('open option tile')}
+          @c4p-options-tile-close=${console.log('close option tile')}
+        >
+          <div slot="summary">
+            <span>English | Locale: English</span>
+          </div>
+          ${args.enabled
+            ? html`
+                <div slot="toggle">
+                  <cds-toggle
+                    id="my-toggle"
+                    size="sm"
+                    hideLabel
+                    ?disabled=${args.locked}
+                  ></cds-toggle>
+                </div>
+              `
+            : ''}
+          <div slot="body">
+            <div class=${`${blockClass}__body`}>
+              <p>
+                User interface defines the language the application is displayed
+                in. Locale sets the regional display formats for information
+                like time, date, currency and decimal delimiters.
+              </p>
+              <div class=${`${blockClass}__dropdown`}>
+                <cds-dropdown
+                  title-text="User interface"
+                  value="${languages[0].value}"
+                >
+                  ${languages.map(
+                    (lang) =>
+                      html`<cds-dropdown-item value="${lang.value}"
+                        >${lang.label}</cds-dropdown-item
+                      >`
+                  )}
+                </cds-dropdown>
+              </div>
+              <div class=${`${blockClass}__dropdown`}>
+                <cds-dropdown title-text="Locale" value="${locales[0].value}">
+                  ${locales.map(
+                    (locale) =>
+                      html`<cds-dropdown-item value="${locale.value}"
+                        >${locale.label}</cds-dropdown-item
+                      >`
+                  )}
+                </cds-dropdown>
+              </div>
             </div>
           </div>
-        </div>
-      </c4p-options-tile>
+        </c4p-options-tile>
+      </div>
+    `;
+  },
+};
+
+export const StaticOptionsTile = {
+  args: {
+    defaultOpen: false,
+    enabled: false,
+    locked: false,
+    lockedText: 'This option is managed by your administrator',
+    size: 'lg',
+    titleId: 'title-id-static',
+    titleText: 'Language',
+    warn: false,
+    warnText: 'A restart is required to apply these settings',
+  },
+  argTypes,
+  render: (args) => {
+    return html`
+      <style>
+        ${styles}
+      </style>
+      <div class="${blockClass}-wrapper">
+        <c4p-options-tile
+          class=${blockClass}
+          id="my-tile-static"
+          size=${args.size}
+          titleId=${args.titleId}
+          titleText=${args.titleText}
+          ?locked=${args.locked}
+          lockedText=${args.lockedText}
+          ?warn=${args.warn}
+          warnText=${args.warnText}
+        >
+          <div slot="summary">
+            <span>English | Locale: English</span>
+          </div>
+        </c4p-options-tile>
+      </div>
     `;
   },
 };

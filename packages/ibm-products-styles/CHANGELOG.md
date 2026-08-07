@@ -1,4 +1,87 @@
-## `@carbon/ibm-products-styles@2.86.0-rc.0`
+## `@carbon/ibm-products-styles@2.92.0-rc.0`
+### Features :rocket:
+- feat(Card): implement horizontal card (#9704)
+
+### Bug fixes :bug:
+- fix(aboutmodal): hyperlinks spacing to 12px (#9756)
+- fix(Tearsheet): design review changes and fixes in webcomponent (#9731)
+- fix(pageheader): fix overflow breadcrumb menu zindex (#9735)
+
+### Housekeeping :house:
+- chore(Card): Review and analyse Card implementation (WIP) (#9738)
+
+## `@carbon/ibm-products-styles@2.91.0`
+### Features :rocket:
+- feat(Card): implement card footer and primitives (#9659)
+- feat(Card): implement composable `Card` header primitives (#9632)
+- feat(addselect): Progressive loading pattern (#9605)
+
+### Bug fixes :bug:
+- fix(BigNumber): Use figure & figcaption in both react and wc (#9707)
+- fix(aboutmodal): hyperlink spacing (#9702)
+- fix: design rerview changes react (#9621)
+
+### Housekeeping :house:
+- style(addselect): refine styles of add select components and patterns (#9669)
+- build(deps): update to Carbon 11 compatible versions to latest (#9660)
+- chore: upgrade jest to 30.0.5 (#9585)
+
+## `@carbon/ibm-products-styles@2.90.0`
+### Features :rocket:
+- feat(Card): initial scaffolding (#9597)
+
+### Bug fixes :bug:
+- fix(tearsheet): increase the top margin to 88px from 46px (#9471)
+- fix(UserProfileImage): css deprecation issue (#9578)
+- fix: update import of Carbon css from all component styles (#9541)
+- fix(preview_PageHeader): resolve a11y issues (#9519)
+
+### Housekeeping :house:
+- build(deps): update to Carbon 11 compatible versions to latest (#9539)
+
+## `@carbon/ibm-products-styles@2.89.0`
+### Features :rocket:
+- feat(preview_PageHeader): implement disable sticky tab bar (#9365)
+
+### Bug fixes :bug:
+- fix(preview__Tearsheet): accessibilty review issues fixes (#9512)
+- fix(Tearsheet): fix focus order of close button (#9496)
+- fix(coachmark): release review updates (#9558)
+- fix(PageHeader): resolve horizontal scroll issue (#9507)
+
+## `@carbon/ibm-products-styles@2.88.0`
+### Features :rocket:
+- feat(addselect): code refactoring and patterns (#9515)
+- feat(EditInPlace): Web component implementation (#9384)
+- feat(AddSelect): composable add select with patterns (#9368)
+- feat(createTearsheetNarrow): implemented as pattern (#9404)
+
+### Housekeeping :house:
+- docs(changelog): update for v2.91.0-rc.0 (#9462)
+## `@carbon/ibm-products-styles@2.88.0-rc.1`
+### Features :rocket:
+- feat(addselect): code refactoring and patterns (#9515)
+
+## `@carbon/ibm-products-styles@2.88.0-rc.0`
+### Features :rocket:
+- feat(EditInPlace): Web component implementation (#9384)
+- feat(AddSelect): composable add select with patterns (#9368)
+- feat(createTearsheetNarrow): implemented as pattern (#9404)
+
+### Housekeeping :house:
+- docs(changelog): update for v2.91.0-rc.0 (#9462)
+
+## `@carbon/ibm-products-styles@2.87.0`
+### Features :rocket:
+- feat: Replace Interstitial Screen internal carousel with Carbon utility carousel (#9399)
+
+### Bug fixes :bug:
+- fix(preview_PageHeader): fix header padding (#9440)
+
+### Housekeeping :house:
+- build(deps): update Carbon 11 compatible versions to latest (#9405)
+
+## `@carbon/ibm-products-styles@2.86.0`
 ### Bug fixes :bug:
 - fix(TruncatedText): provide keyboard accessibility (#9245)
 - fix(preview_PageHeader): `HeroImage` not taking the full height (#9268)

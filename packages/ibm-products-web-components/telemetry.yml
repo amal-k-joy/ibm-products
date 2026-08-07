@@ -26,14 +26,21 @@ collect:
         - is-flush
         - kind
         - label
+        - label-text
         - lines
+        - onc4p-add-select-row-navigate
+        - onc4p-add-select-row-select
         - open
+        - overflow-aria-label
         - prevent-close-on-click-outside
         - selector-initial-focus
+        - selector-primary-focus
         - size
         - slot
+        - subtitle
         - title
         - titleText
+        - tooltip-alignment
         - type
         - value
         - view-all-label
@@ -49,6 +56,22 @@ collect:
         - version
         # c4p-action-set
         - disable-stacking
+        # c4p-add-select
+        - multi
+        # c4p-add-select-body
+        - global-search-label
+        - global-search-placeholder
+        - item-count
+        - items-label
+        - onc4p-add-select-body-search
+        - path
+        - search-results-title
+        # c4p-add-select-row
+        - disabled
+        - has-children
+        - item-id
+        - parent-id
+        - selected
         # c4p-big-number
         - fraction-digits
         - loading
@@ -72,6 +95,7 @@ collect:
         - status
         # c4p-coachmark
         - caret
+        - drag-aria-label
         - dropShadow
         - floating
         - highContrast
@@ -86,6 +110,24 @@ collect:
         # c4p-coachmark-tagline
         - onc4p-coachmark-tagline-close
         - onc4p-coachmark-tagline-cta-click
+        # c4p-edit-in-place
+        - cancel-label
+        - default-value
+        - edit-always-visible
+        - edit-label
+        - inherit-typography
+        - invalid
+        - invalid-text
+        - onc4p-edit-in-place-blur
+        - onc4p-edit-in-place-cancel
+        - onc4p-edit-in-place-change
+        - onc4p-edit-in-place-save
+        - placeholder
+        - read-only
+        - read-only-label
+        - read-only-toggletip-text
+        - save-label
+        - toggletip-alignment
         # c4p-guide-banner
         - onc4p-guide-banner-close
         - onc4p-guide-banner-toggle
@@ -130,33 +172,43 @@ collect:
         - today-text
         - triggerButtonRef
         # c4p-options-tile
+        - locked
+        - lockedText
         - onc4p-options-tile-close
         - onc4p-options-tile-open
         - titleId
+        - warn
+        - warnText
         # c4p-page-header-actions-set
         - actions-data
         # c4p-page-header-breadcrumb
+        - actions-aria-label
         - border
         - content-actions-flush
         - page-actions-flush
         # c4p-page-header-breadcrumbs-set
+        - breadcrumb-aria-label
         - breadcrumbs-data
         - hiddenItems
+        # c4p-page-header-content
+        - title-level
         # c4p-page-header-content-text
-        - subtitle
+        - subtitle-level
         # c4p-page-header-hero-image
         - object-fit
         # c4p-page-header-scroller
         - close-on-activation
         - enter-delay-ms
         - leave-delay-ms
+        # c4p-page-header-tabs
+        - disable-sticky-tab-bar
         # c4p-page-header-tags-set
         - tags-data
         # c4p-preview-tearsheet
         - container-class-name
         - onc4p-preview-tearsheet-beingclosed
         - onc4p-preview-tearsheet-closed
-        - selector-primary-focus
+        - onc4p-preview-tearsheet-collapse-change
         - selectors-floating-menus
         - summary-content-width
         - variant
@@ -167,12 +219,12 @@ collect:
         - condensed-actions
         - current-step
         - include-overlay
-        - label-text
         - navigation-back-icon-description
         - onc4p-side-panel-beingclosed
         - onc4p-side-panel-closed
         - onc4p-side-panel-navigate-back
         - placement
+        - resizable
         - selector-page-content
         - slide-in
         # c4p-tearsheet
@@ -184,14 +236,16 @@ collect:
         - width
         # c4p-tearsheet-header
         - disable-header-collapse
-        - onc4p-tearsheet-header-close-button-clicked
+        - onc4p-tearsheet-header-collapse-change
         # c4p-tearsheet-influencer
+        - influencer-panel-aria-label
         - influencer-panel-open
         - oncds-tearsheet-influencer-closed
         # c4p-tearsheet-stack
         - stack-step-size
         # c4p-tearsheet-summary-content
         - oncds-tearsheet-summary-closed
+        - summary-panel-aria-label
         - summary-panel-open
         # c4p-user-avatar
         - background-color
@@ -199,7 +253,6 @@ collect:
         - image-description
         - name
         - theme
-        - tooltip-alignment
         - tooltip-text
         # stacking-tearsheet-demo
         - tearsheet-type
@@ -215,18 +268,6 @@ collect:
         - md
         - sm
         - xl
-        # General - influencer-width
-        - narrow
-        - wide
-        # General - kind
-        - "403"
-        - "404"
-        - checked
-        - custom
-        - disabled
-        - error
-        - indeterminate
-        - unchecked
         # General - size
         - 2xl
         - default
@@ -234,7 +275,15 @@ collect:
         - md
         - sm
         - xl
-        - xs
+        # General - tooltip-alignment
+        - bottom
+        - bottom-left
+        - bottom-right
+        - left
+        - right
+        - top
+        - top-left
+        - top-right
         # General - type
         - error
         - expand
@@ -242,21 +291,34 @@ collect:
         - success
         - tooltip
         - warning
+        # c4p-edit-in-place - toggletip-alignment
+        - bottom
+        - bottom-left
+        - bottom-right
+        - left
+        - right
+        - top
+        - top-left
+        - top-right
+        # c4p-page-header-content - title-level
+        - h1
+        - h2
+        - h3
+        - h4
+        - h5
+        - h6
+        # c4p-page-header-content-text - subtitle-level
+        - h2
+        - h3
+        - h4
+        - h5
+        - h6
         # c4p-page-header-hero-image - object-fit
         - contain
         - cover
         - fill
         - none
         # c4p-preview-tearsheet - variant
-        - narrow
-        - wide
-        # c4p-side-panel - placement
-        - left
-        - right
-        # c4p-tearsheet - influencer-placement
-        - left
-        - right
-        # c4p-tearsheet - width
         - narrow
         - wide
         # c4p-tearsheet-stack - stack-step-size

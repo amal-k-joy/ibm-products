@@ -1,5 +1,5 @@
 /**
- * Copyright IBM Corp. 2020, 2024
+ * Copyright IBM Corp. 2020, 2026
  *
  * This source code is licensed under the Apache-2.0 license found in the
  * LICENSE file in the root directory of this source tree.
@@ -132,12 +132,18 @@ const parameters = {
         ['Welcome', 'Examples', '*'],
         'Components',
         'Patterns',
-        ['*', 'Prebuilt patterns'],
+        [
+          'Add and select',
+          ['Overview', 'SingleAddSelect', 'MultiAddSelect'],
+          '*',
+          'Prebuilt patterns',
+        ],
         'Utilities',
         'Preview',
         'Preview Candidate',
         ['*', 'FeatureFlags'],
         'Deprecated',
+        ['Prebuilt Patterns', ['Overview', '*']],
       ],
     },
   },
@@ -155,9 +161,7 @@ const parameters = {
   chromatic: {
     modes: {
       g10: allModes['g10'],
-      g90: allModes['g90'],
       g100: allModes['g100'],
-      'breakpoint-sm': allModes['breakpoint-sm'],
     },
   },
 };

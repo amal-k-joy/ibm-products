@@ -17,8 +17,9 @@ import { pkg } from '../../../settings';
 interface TearsheetContextType {
   fullyCollapsed: boolean;
   setFullyCollapsed?: (value: boolean) => void;
-  refs?: any;
+  refs?: unknown;
   onClose?: () => void;
+  onHeaderCollapse?: (collapsed: boolean) => void;
   disableHeaderCollapse?: boolean;
   setDisableHeaderCollapse?: (value: boolean) => void;
   variant: 'wide' | 'narrow';
@@ -26,6 +27,7 @@ interface TearsheetContextType {
   decorator?: ReactNode;
   closeIconDescription?: string;
   hideCloseButton?: boolean;
+  titleId?: string;
 }
 export const TearsheetContext = createContext<TearsheetContextType>({
   fullyCollapsed: false,

@@ -48,6 +48,12 @@ class CDSTearsheetInfluencer extends SignalWatcher(
   influencerPanelOpen: boolean = false;
 
   /**
+   * Optional aria-label for the influencer panel. Defaults to "Influencer panel".
+   */
+  @property({ attribute: 'influencer-panel-aria-label' })
+  influencerPanelAriaLabel: string = 'Influencer panel';
+
+  /**
    * Handler for closing the influencer panel
    */
   private handleClose = () => {
@@ -64,13 +70,15 @@ class CDSTearsheetInfluencer extends SignalWatcher(
     const { isSm } = tearsheetSignal.get();
 
     return !isSm
-      ? html` <aside>
+      ? html` <aside aria-label="${this.influencerPanelAriaLabel}">
           <slot></slot>
         </aside>`
       : html` <c4p-side-panel
           size="sm"
           ?open="${this.influencerPanelOpen}"
           placement="left"
+          aria-label="${this.influencerPanelAriaLabel}"
+          aria-modal="true"
           @c4p-side-panel-closed="${this.handleClose}"
         >
           <slot></slot>

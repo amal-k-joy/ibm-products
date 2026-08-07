@@ -1,4 +1,4 @@
-FROM node:22.22.2-slim
+FROM node:22.23.2-slim
 
 WORKDIR /usr/src/action
 COPY package.json ./

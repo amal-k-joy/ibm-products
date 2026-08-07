@@ -22,7 +22,7 @@ import { createPortal } from 'react-dom';
 import cx from 'classnames';
 import {
   ComposedModal,
-  ComposedModalProps,
+  type ComposedModalProps,
   unstable_FeatureFlags as FeatureFlags,
   Layer,
   ModalBody,
@@ -30,32 +30,32 @@ import {
 } from '@carbon/react';
 import { blockClass, TearsheetContext } from './context';
 import TearsheetHeader, {
-  TearsheetHeaderProps,
+  type TearsheetHeaderProps,
   TearsheetNavigationBar,
-  TearsheetNavigationBarProps,
+  type TearsheetNavigationBarProps,
   TearsheetScrollButton,
-  TearsheetScrollButtonProps,
+  type TearsheetScrollButtonProps,
 } from './TearsheetHeader';
 import TearsheetHeaderContent, {
-  TearsheetHeaderContentProps,
+  type TearsheetHeaderContentProps,
 } from './TearsheetHeaderContent';
 import TearsheetBody, {
   Influencer,
-  InfluencerProps,
+  type InfluencerProps,
   MainContent,
-  MainContentProps,
+  type MainContentProps,
   SummaryContent,
-  SummaryContentProps,
-  TearsheetBodyProps,
+  type SummaryContentProps,
+  type TearsheetBodyProps,
 } from './TearsheetBody';
 
 import {
   TearsheetHeaderActionItem,
-  TearsheetHeaderActionItemProps,
+  type TearsheetHeaderActionItemProps,
   TearsheetHeaderActions,
-  TearsheetHeaderActionsProps,
+  type TearsheetHeaderActionsProps,
 } from './TearsheetHeaderActions';
-import TearsheetFooter, { TearsheetFooterProps } from './TearsheetFooter';
+import TearsheetFooter, { type TearsheetFooterProps } from './TearsheetFooter';
 import { breakpoints } from '@carbon/layout';
 import { useStackContext } from './StackContext';
 import { useMatchMedia } from '../../../global/js/hooks/useMatchMedia';
@@ -73,77 +73,89 @@ export interface TearsheetProps extends ComposedModalProps {
   children?: React.ReactNode;
 
   /**
-   * Specifies whether the tearsheet is currently open.
+   * Whether the tearsheet is currently open.
    */
   open?: boolean;
 
   /**
-   * User can pass any class names to add to the modal wrapper
+   * Optional class names added to the modal wrapper.
    */
   className?: string;
+
   /**
-   * User can pass any class names that will added to the modal container, rather than the wrapper
+   * Optional class names added to the modal container (not the wrapper).
    */
   containerClassName?: string;
+
   /**
-   * the defines the gap from top of the view port. Defaulted to 3rem
+   * Gap from the top of the viewport. Defaults to `88px`.
    */
   verticalGap?: string;
+
   /**
-   * Default influencer takes 256px, this allow to override eg: 300px , 20rem
+   * Override the default influencer width (`256px`). Accepts any valid CSS
+   * length, e.g. `"300px"` or `"20rem"`.
    */
   influencerWidth?: string;
+
   /**
-   * Default rightContent takes 256px, this allow to override eg: 300px , 20rem
+   * Override the default summary content width (`256px`).
    */
   summaryContentWidth?: string;
+
   /**
-   * Default to wide variant. Pass in narrow for narrow tearsheet
+   * Tearsheet variant. Defaults to `"wide"`.
    */
   variant?: 'wide' | 'narrow';
+
   /**
-   * Optional prop that allows you to pass any component.
+   * Optional decorator component (e.g. `AILabel`).
    */
   decorator?: ReactNode;
 
   /**
-   * Specify the CSS selectors that match the floating menus.
+   * CSS selectors that match floating menus inside the tearsheet.
    *
    * See https://react.carbondesignsystem.com/?path=/docs/components-composedmodal--overview#focus-management
    */
   selectorsFloatingMenus?: string[];
 
   /**
-   * The aria label applied to the tearsheet
+   * Accessible label for the tearsheet dialog.
    */
   ariaLabel?: string;
 
   /**
-   * An optional handler that is called when the user closes the tearsheet (by
-   * clicking the close button, if enabled, or clicking outside, if enabled).
-   * Returning `false` here prevents the modal from closing.
+   * Called when the user dismisses the tearsheet. Return `false` to prevent
+   * the tearsheet from closing.
    */
   onClose?: () => void;
+
   /**
-   * Specify a CSS selector that matches the DOM element that should be
-   * focused when the Modal opens.
+   * CSS selector for the element that should receive focus when the tearsheet
+   * opens.
    */
   selectorPrimaryFocus?: string;
+
   /**
-   * The DOM element that the tearsheet should be rendered within. Defaults to document.body.
+   * DOM element to portal the tearsheet into. Defaults to `document.body`.
    */
   portalTarget?: HTMLElement;
+
   /**
-   * Disable the portal behavior and render the tearsheet in the existing DOM structure.
-   * This is useful for testing, when you need to inherit React context from parent components,
-   * or when you don't need the z-index isolation that portals provide.
+   * Disable the portal and render the tearsheet inline. Useful for tests and
+   * contexts where you need to inherit React context from parent components.
+   *
    * @default false
    */
   disablePortal?: boolean;
+
   /**
-   * If true, the tearsheet will remain mounted in the DOM when closed, using CSS to hide it.
-   * By default (false), the tearsheet unmounts from the DOM after the exit animation completes.
-   * Set to true if you need to preserve component state or avoid remounting overhead.
+   * When `true`, the tearsheet stays mounted in the DOM when closed and is
+   * hidden via CSS only. Use this to preserve component state or avoid
+   * remounting overhead.
+   *
+   * @default false
    */
   keepMounted?: boolean;
 }
@@ -195,6 +207,7 @@ const TearsheetInternal = forwardRef<
       isExiting = false,
       presenceRef,
       decorator,
+      launcherButtonRef,
       ...rest
     },
     ref: ForwardedRef<HTMLDivElement>
@@ -217,19 +230,31 @@ const TearsheetInternal = forwardRef<
     const footer = arr.find((child: any) => child.type === TearsheetFooter);
 
     const uniqueId = useRef(useId());
+    const titleId = useRef(`${blockClass}__title-${uniqueId.current}`);
     const { notifyStack, stack, getDepth, getScaleFactor, getBlockSizeChange } =
       useStackContext();
 
     const [depth, setDepth] = useState(0);
-    const [mountNode, setMountNode] = useState<HTMLElement | null>(null);
 
-    // Set portal mount node using useIsomorphicEffect to avoid SSR issues and double rendering
-    useIsomorphicEffect(() => {
-      if (!disablePortal) {
-        setMountNode(portalTarget || document.body);
+    // Initialize mountNode eagerly so the tearsheet renders directly into the
+    // portal on its first paint.  Deferring this to an effect caused the
+    // component to first render inline (mountNode === null), then immediately
+    // remount inside the portal once the effect ran — two mounts = two
+    // entrance animations.  The lazy initializer is SSR-safe: useState
+    // initializers only run in the browser, and typeof document is guarded.
+    const [mountNode, setMountNode] = useState<HTMLElement | null>(() => {
+      if (disablePortal || typeof document === 'undefined') {
+        return null;
       }
+      return portalTarget ?? document.body;
+    });
+
+    // Keep mountNode in sync when portalTarget or disablePortal changes at runtime.
+    useIsomorphicEffect(() => {
+      setMountNode(disablePortal ? null : (portalTarget ?? document.body));
     }, [portalTarget, disablePortal]);
 
+    // Set CSS custom properties driven by props
     useIsomorphicEffect(() => {
       const AILabelWidth =
         localRef.current?.querySelector(`.${carbonPrefix}--ai-label`)
@@ -260,8 +285,16 @@ const TearsheetInternal = forwardRef<
       }
 
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isSm, decorator, influencerWidth, summaryContentWidth, verticalGap]);
+    }, [
+      isSm,
+      decorator,
+      influencerWidth,
+      summaryContentWidth,
+      verticalGap,
+      fullyCollapsed,
+    ]);
 
+    // Notify the stack context when this tearsheet opens / unmounts
     useIsomorphicEffect(() => {
       const id = uniqueId.current;
       if (localRef.current && open) {
@@ -275,6 +308,7 @@ const TearsheetInternal = forwardRef<
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [localRef.current, open]);
 
+    // Apply stacking CSS variables whenever the stack changes
     useEffect(() => {
       if (stack?.length > 0 && localRef.current) {
         const stackDepth = getDepth?.(uniqueId.current),
@@ -293,6 +327,47 @@ const TearsheetInternal = forwardRef<
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [stack]);
 
+    // Return focus to launcher button when tearsheet closes
+    useEffect(() => {
+      if (!open && launcherButtonRef?.current) {
+        // Use a small delay to ensure the tearsheet has fully closed
+        const timeoutId = setTimeout(() => {
+          const refCurrent = launcherButtonRef.current;
+
+          if (refCurrent instanceof HTMLElement) {
+            // Check if the button is inside a TearsheetHeaderActions component
+            const headerActionItem = refCurrent.closest(
+              `.${blockClass}__header-action-item`
+            );
+
+            if (headerActionItem) {
+              // This is a button inside TearsheetHeaderActions
+              // Check if it's currently visible or if items are collapsed to menu
+              const headerActionsContainer = headerActionItem.closest(
+                `.${blockClass}__content__header-actions`
+              );
+              const menuButton = headerActionsContainer?.querySelector(
+                `.${blockClass}__header-actions-menuButton:not(.${blockClass}__header-actions-menuButton--hidden) button`
+              );
+
+              if (menuButton instanceof HTMLElement) {
+                // On small screens, action buttons collapse to menu - focus the menu button
+                menuButton.focus();
+              } else {
+                // On large screens, focus the action button directly
+                refCurrent.focus();
+              }
+            } else {
+              // Regular button ref (not inside TearsheetHeaderActions): focus directly
+              refCurrent.focus();
+            }
+          }
+        }, 100);
+
+        return () => clearTimeout(timeoutId);
+      }
+    }, [open, launcherButtonRef]);
+
     const content = (
       <TearsheetContext.Provider
         value={{
@@ -304,6 +379,7 @@ const TearsheetInternal = forwardRef<
           variant,
           isSm,
           decorator,
+          titleId: titleId.current,
         }}
       >
         <FeatureFlags
@@ -315,15 +391,18 @@ const TearsheetInternal = forwardRef<
           <ComposedModal
             {...rest}
             aria-label={ariaLabel}
+            aria-labelledby={!ariaLabel ? titleId.current : undefined}
             className={cx(blockClass, className, {
               [`${blockClass}--wide`]: variant === 'wide',
               [`${blockClass}--narrow`]: variant === 'narrow',
               [`${blockClass}--stacked`]: depth > 0,
               [`${blockClass}--stack-activated`]: stack.length > 1,
               [`${blockClass}--has-ai-label`]:
-                !!decorator && decorator['type']?.displayName === 'AILabel',
+                !!decorator &&
+                (decorator as any)['type']?.displayName === 'AILabel',
               [`${blockClass}--has-decorator`]:
-                !!decorator && decorator['type']?.displayName !== 'AILabel',
+                !!decorator &&
+                (decorator as any)['type']?.displayName !== 'AILabel',
               ['is-visible']: keepMounted ? open : true, // When keepMounted, use open prop; otherwise always visible
               [`${blockClass}--keep-mounted`]: keepMounted,
             })}
@@ -346,7 +425,7 @@ const TearsheetInternal = forwardRef<
               ...selectorsFloatingMenus,
             ]}
             isFullWidth={true}
-            size={variant === 'narrow' ? 'sm' : ''}
+            size={variant === 'narrow' ? 'sm' : undefined}
             data-tearsheet-exiting={isExiting ? true : undefined}
           >
             {header}
@@ -410,6 +489,7 @@ export const Tearsheet = forwardRef<HTMLDivElement, TearsheetProps>(
   }
 ) as TearsheetComponentType;
 
+Tearsheet.displayName = 'Tearsheet';
 Tearsheet.Header = TearsheetHeader;
 Tearsheet.HeaderContent = TearsheetHeaderContent;
 Tearsheet.Body = TearsheetBody;
